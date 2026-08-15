@@ -1,8 +1,8 @@
 #!/bin/bash
 # =============================================================
 # app.gdh - EC2 Server Setup Script
-# Static site (plain HTML/CSS/JS, no build step), served via a `serve`
-# process on 127.0.0.1:$PORT that Nginx reverse-proxies to.
+# Next.js app, built with `next build` and run with `next start` on
+# 127.0.0.1:$PORT via systemd, that Nginx reverse-proxies to.
 # Run this ONCE on a fresh Ubuntu 24.04 EC2 instance.
 #
 # Usage:
@@ -25,7 +25,7 @@ fi
 
 APP_NAME="${APP_NAME:-app}"
 APP_DIR="${APP_DIR:-/var/www/app}"
-DOMAIN="${DOMAIN:-app.globaldesingerhub.com}"
+DOMAIN="${DOMAIN:-app.globaldesignerhub.com}"
 DEPLOY_USER="${DEPLOY_USER:-ubuntu}"
 CERTBOT_EMAIL="${CERTBOT_EMAIL:-}"
 PORT="${PORT:-8003}"
@@ -38,10 +38,10 @@ echo "Updating system packages..."
 apt update && apt upgrade -y
 
 # --- 2. Install dependencies ---
-# No Python/venv/Postgres/Gunicorn: this is a static site with no build step.
-# It's served by a tiny Node static-file server (`serve`) on 127.0.0.1:$PORT,
-# which Nginx reverse-proxies to - keeps the app on a dedicated port like the
-# other apps on this box instead of pointing Nginx `root` at the checkout.
+# No Python/venv/Postgres/Gunicorn: this is a Node app. `next build` produces
+# a server that runs via `next start` on 127.0.0.1:$PORT, which Nginx
+# reverse-proxies to - keeps the app on a dedicated port like the other apps
+# on this box instead of pointing Nginx `root` at the checkout.
 echo "Installing Nginx, Git, Certbot..."
 apt install -y \
     nginx \
@@ -56,10 +56,6 @@ if ! command -v node >/dev/null 2>&1; then
     curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
     apt install -y nodejs
 fi
-
-echo "Installing serve (static file server)..."
-npm install -g serve
-SERVE_BIN="$(command -v serve)"
 
 # --- 3. Configure firewall ---
 echo "Configuring firewall..."
@@ -92,18 +88,25 @@ else
     exit 1
 fi
 
-# --- 5. Systemd service: static file server on 127.0.0.1:$PORT ---
+# --- 5. Install deps and build ---
+echo "Installing dependencies and building $APP_NAME..."
+sudo -u "$DEPLOY_USER" npm --prefix "$APP_DIR" ci
+sudo -u "$DEPLOY_USER" npm --prefix "$APP_DIR" run build
+
+# --- 6. Systemd service: Next.js server on 127.0.0.1:$PORT ---
 echo "Configuring $APP_NAME systemd service on port $PORT..."
 cat > "/etc/systemd/system/$APP_NAME.service" << EOF
 [Unit]
-Description=Static file server for $APP_NAME (serve on port $PORT)
+Description=Next.js server for $APP_NAME (next start on port $PORT)
 After=network.target
 
 [Service]
 Type=simple
 User=$DEPLOY_USER
 WorkingDirectory=$APP_DIR
-ExecStart=$SERVE_BIN -l tcp://127.0.0.1:$PORT --no-clipboard $APP_DIR
+EnvironmentFile=-$SCRIPT_DIR/.env
+Environment=NODE_ENV=production
+ExecStart=$APP_DIR/node_modules/.bin/next start -p $PORT
 Restart=always
 RestartSec=3
 
@@ -115,7 +118,7 @@ systemctl daemon-reload
 systemctl enable "$APP_NAME"
 systemctl restart "$APP_NAME"
 
-# --- 6. Configure Nginx (reverse proxy to the static file server) ---
+# --- 7. Configure Nginx (reverse proxy to the Next.js server) ---
 echo "Configuring Nginx..."
 cat > "/etc/nginx/sites-available/$APP_NAME" << EOF
 server {
@@ -128,8 +131,10 @@ server {
     gzip_min_length 256;
     gzip_types text/plain text/css application/javascript application/json image/svg+xml;
 
-    # Unfingerprinted assets (no build step) - short cache, not immutable,
+    # Unfingerprinted assets served from /public - short cache, not immutable,
     # so updated images/CSS don't stay stale in returning visitors' caches.
+    # (Next's own fingerprinted /_next/static assets set their own immutable
+    # Cache-Control and fall through to the location / block below.)
     location /assets/ {
         proxy_pass http://127.0.0.1:$PORT;
         expires 7d;

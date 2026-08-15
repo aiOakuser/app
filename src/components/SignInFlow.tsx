@@ -201,7 +201,7 @@ export function SignInFlow({
 
       {step === "phone" && (
         <form onSubmit={requestCode}>
-          <h1 className="mb-6 text-[22px] leading-snug font-semibold text-neutral-900">
+          <h1 className="mb-6 text-center text-[22px] leading-snug font-semibold text-neutral-900">
             {content.title}
           </h1>
 
