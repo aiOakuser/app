@@ -185,19 +185,19 @@ export function SignInFlow({
 
   return (
     <div className="mx-auto w-full max-w-sm" style={accentStyle}>
-      <div className="mb-6 flex items-center justify-center gap-2 text-[13px] text-neutral-500">
+      <div className="mb-5 flex items-center justify-center gap-2 text-[13px] font-medium text-neutral-500">
         {tenant.logoUrl ? (
           <Image
             src={tenant.logoUrl}
             alt={`${tenant.displayName} logo`}
-            width={16}
-            height={16}
+            width={18}
+            height={18}
             unoptimized
-            className="h-4 w-4 rounded-[5px] object-contain"
+            className="h-[18px] w-[18px] rounded-[5px] object-contain"
           />
         ) : (
           <span
-            className="h-4 w-4 rounded-[5px]"
+            className="h-[18px] w-[18px] rounded-[6px]"
             style={{ background: tenant.accent }}
             aria-hidden
           />
@@ -205,157 +205,165 @@ export function SignInFlow({
         {tenant.displayName}
       </div>
 
-      {step === "phone" && (
-        <form onSubmit={requestCode}>
-          <h1 className="mb-1 text-center text-[22px] leading-snug font-semibold text-neutral-900">
-            {content.heading}
-          </h1>
-          <p className="mb-6 text-center text-[13px] font-medium text-neutral-400">
-            {content.subheading}
-          </p>
+      <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-[0_1px_2px_rgba(0,0,0,0.03),0_12px_28px_-16px_rgba(0,0,0,0.12)] sm:p-8">
+        {step === "phone" && (
+          <form onSubmit={requestCode}>
+            <h1 className="mb-1 text-center text-[22px] leading-snug font-semibold text-neutral-900">
+              {content.heading}
+            </h1>
+            <p className="mb-6 text-center text-[13px] font-medium text-neutral-400">
+              {content.subheading}
+            </p>
 
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <CountrySelect
-              options={countries}
-              value={country}
-              onChange={setCountry}
-              accent={tenant.accent}
-            />
-            <div className="flex-[1.2]">
-              <input
-                type="tel"
-                inputMode="tel"
-                autoComplete="tel-national"
-                placeholder={content.phonePlaceholder}
-                value={phoneRaw}
-                onChange={(e) => setPhoneRaw(e.target.value)}
-                className="h-full w-full rounded-2xl border border-neutral-200 bg-white px-4 py-3.5 text-[15px] text-neutral-900 placeholder:text-neutral-400 focus:outline-none"
+            <div className="flex gap-2.5">
+              <CountrySelect
+                options={countries}
+                value={country}
+                onChange={setCountry}
+                accent={tenant.accent}
               />
+              <div className="min-w-0 flex-1">
+                <input
+                  type="tel"
+                  inputMode="tel"
+                  autoComplete="tel-national"
+                  placeholder={content.phonePlaceholder}
+                  value={phoneRaw}
+                  onChange={(e) => setPhoneRaw(e.target.value)}
+                  className="h-full w-full rounded-2xl border border-neutral-200 bg-white px-4 py-3.5 text-[15px] text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-offset-1"
+                  style={{ ["--tw-ring-color" as string]: tenant.accent }}
+                />
+              </div>
             </div>
-          </div>
 
-          {phoneError && (
-            <p className="mt-2 text-[13px] text-red-600" role="alert">
-              {phoneError}
-            </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading || phoneRaw.trim() === ""}
-            className="mt-4 w-full rounded-full bg-neutral-900 py-3.5 text-[15px] font-semibold text-white transition disabled:opacity-40"
-          >
-            {loading ? "Sending…" : content.cta}
-          </button>
-
-          <p className="mt-4 text-center text-[12px] leading-relaxed text-neutral-400">
-            {content.disclosure}
-          </p>
-        </form>
-      )}
-
-      {step === "otp" && (
-        <div>
-          <button
-            type="button"
-            onClick={() => setStep("phone")}
-            className="mb-4 text-[13px] text-neutral-500 hover:text-neutral-700"
-          >
-            ← {otpContent(phoneMasked).changeNumber}
-          </button>
-
-          <h1 className="mb-5 text-[22px] leading-snug font-semibold text-neutral-900">
-            {otpContent(phoneMasked).title}
-          </h1>
-
-          {devCode && (
-            <p className="mb-4 rounded-lg bg-amber-50 px-3 py-2 text-[12.5px] text-amber-800">
-              Dev mode — no SMS provider connected. Your code is <b>{devCode}</b>.
-            </p>
-          )}
-
-          <div className="flex gap-2">
-            {otpDigits.map((digit, i) => (
-              <input
-                key={i}
-                ref={(el) => {
-                  otpBoxRefs.current[i] = el;
-                }}
-                value={digit}
-                onChange={(e) => onDigitChange(i, e.target.value)}
-                onKeyDown={(e) => onDigitKeyDown(i, e)}
-                onPaste={onDigitPaste}
-                inputMode="numeric"
-                maxLength={1}
-                aria-label={`Digit ${i + 1}`}
-                className="aspect-square w-full rounded-xl border text-center text-[18px] font-medium text-neutral-900 focus:outline-none"
-                style={{
-                  borderColor: digit ? tenant.accent : "#e5e5e5",
-                }}
-              />
-            ))}
-          </div>
-
-          {otpError && (
-            <p className="mt-3 text-[13px] text-red-600" role="alert">
-              {otpError}
-            </p>
-          )}
-
-          <button
-            type="button"
-            onClick={() => submitCode(otpDigits.join(""))}
-            disabled={loading || otpDigits.some((d) => d === "")}
-            className="mt-5 w-full rounded-full bg-neutral-900 py-3.5 text-[15px] font-semibold text-white transition disabled:opacity-40"
-          >
-            {loading ? "Verifying…" : otpContent(phoneMasked).cta}
-          </button>
-
-          <p className="mt-4 text-center text-[13px] text-neutral-500">
-            {resendSeconds > 0 ? (
-              <>Resend code in 0:{String(resendSeconds).padStart(2, "0")}</>
-            ) : (
-              <button type="button" onClick={resend} className="font-medium text-neutral-700 underline">
-                {otpContent(phoneMasked).resendReady}
-              </button>
+            {phoneError && (
+              <p className="mt-2 text-[13px] text-red-600" role="alert">
+                {phoneError}
+              </p>
             )}
-          </p>
-        </div>
-      )}
 
-      {step === "profile" && (
-        <form onSubmit={completeProfile}>
-          <h1 className="mb-2 text-[22px] leading-snug font-semibold text-neutral-900">
-            You&rsquo;re verified — what should we call you?
-          </h1>
-          <p className="mb-5 text-[13.5px] text-neutral-500">
-            First visit to {tenant.displayName} on GDH Appointments. No password needed.
-          </p>
+            <button
+              type="submit"
+              disabled={loading || phoneRaw.trim() === ""}
+              className="mt-5 w-full rounded-full py-3.5 text-[15px] font-semibold text-white transition hover:brightness-110 disabled:opacity-40"
+              style={{ background: tenant.accent }}
+            >
+              {loading ? "Sending…" : content.cta}
+            </button>
 
-          <input
-            type="text"
-            autoFocus
-            placeholder="Full name"
-            value={profileName}
-            onChange={(e) => setProfileName(e.target.value)}
-            className="w-full rounded-2xl border border-neutral-200 bg-white px-4 py-3.5 text-[15px] text-neutral-900 placeholder:text-neutral-400 focus:outline-none"
-          />
-
-          {profileError && (
-            <p className="mt-2 text-[13px] text-red-600" role="alert">
-              {profileError}
+            <p className="mt-4 text-center text-[12px] leading-relaxed text-neutral-400">
+              {content.disclosure}
             </p>
-          )}
+          </form>
+        )}
 
-          <button
-            type="submit"
-            disabled={loading || profileName.trim() === ""}
-            className="mt-4 w-full rounded-full bg-neutral-900 py-3.5 text-[15px] font-semibold text-white transition disabled:opacity-40"
-          >
-            {loading ? "Finishing…" : "Finish sign in"}
-          </button>
-        </form>
-      )}
+        {step === "otp" && (
+          <div>
+            <button
+              type="button"
+              onClick={() => setStep("phone")}
+              className="mb-4 text-[13px] text-neutral-500 hover:text-neutral-700"
+            >
+              ← {otpContent(phoneMasked).changeNumber}
+            </button>
+
+            <h1 className="mb-5 text-[22px] leading-snug font-semibold text-neutral-900">
+              {otpContent(phoneMasked).title}
+            </h1>
+
+            {devCode && (
+              <p className="mb-4 rounded-lg bg-amber-50 px-3 py-2 text-[12.5px] text-amber-800">
+                Dev mode — no SMS provider connected. Your code is <b>{devCode}</b>.
+              </p>
+            )}
+
+            <div className="flex gap-2">
+              {otpDigits.map((digit, i) => (
+                <input
+                  key={i}
+                  ref={(el) => {
+                    otpBoxRefs.current[i] = el;
+                  }}
+                  value={digit}
+                  onChange={(e) => onDigitChange(i, e.target.value)}
+                  onKeyDown={(e) => onDigitKeyDown(i, e)}
+                  onPaste={onDigitPaste}
+                  inputMode="numeric"
+                  maxLength={1}
+                  aria-label={`Digit ${i + 1}`}
+                  className="aspect-square w-full rounded-2xl border text-center text-[18px] font-medium text-neutral-900 focus:outline-none focus:ring-2 focus:ring-offset-1"
+                  style={{
+                    borderColor: digit ? tenant.accent : "#e5e5e5",
+                    ["--tw-ring-color" as string]: tenant.accent,
+                  }}
+                />
+              ))}
+            </div>
+
+            {otpError && (
+              <p className="mt-3 text-[13px] text-red-600" role="alert">
+                {otpError}
+              </p>
+            )}
+
+            <button
+              type="button"
+              onClick={() => submitCode(otpDigits.join(""))}
+              disabled={loading || otpDigits.some((d) => d === "")}
+              className="mt-5 w-full rounded-full py-3.5 text-[15px] font-semibold text-white transition hover:brightness-110 disabled:opacity-40"
+              style={{ background: tenant.accent }}
+            >
+              {loading ? "Verifying…" : otpContent(phoneMasked).cta}
+            </button>
+
+            <p className="mt-4 text-center text-[13px] text-neutral-500">
+              {resendSeconds > 0 ? (
+                <>Resend code in 0:{String(resendSeconds).padStart(2, "0")}</>
+              ) : (
+                <button type="button" onClick={resend} className="font-medium text-neutral-700 underline">
+                  {otpContent(phoneMasked).resendReady}
+                </button>
+              )}
+            </p>
+          </div>
+        )}
+
+        {step === "profile" && (
+          <form onSubmit={completeProfile}>
+            <h1 className="mb-2 text-[22px] leading-snug font-semibold text-neutral-900">
+              You&rsquo;re verified — what should we call you?
+            </h1>
+            <p className="mb-5 text-[13.5px] text-neutral-500">
+              First visit to {tenant.displayName} on GDH Appointments. No password needed.
+            </p>
+
+            <input
+              type="text"
+              autoFocus
+              placeholder="Full name"
+              value={profileName}
+              onChange={(e) => setProfileName(e.target.value)}
+              className="w-full rounded-2xl border border-neutral-200 bg-white px-4 py-3.5 text-[15px] text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-offset-1"
+              style={{ ["--tw-ring-color" as string]: tenant.accent }}
+            />
+
+            {profileError && (
+              <p className="mt-2 text-[13px] text-red-600" role="alert">
+                {profileError}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading || profileName.trim() === ""}
+              className="mt-4 w-full rounded-full py-3.5 text-[15px] font-semibold text-white transition hover:brightness-110 disabled:opacity-40"
+              style={{ background: tenant.accent }}
+            >
+              {loading ? "Finishing…" : "Finish sign in"}
+            </button>
+          </form>
+        )}
+      </div>
     </div>
   );
 }

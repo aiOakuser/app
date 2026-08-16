@@ -3,7 +3,7 @@ export function signInContent(brandName: string) {
     heading: `Sign in to ${brandName}`,
     subheading: "with GDH Appointments",
     countryLabel: "Country",
-    phonePlaceholder: "Mobile Phone Number",
+    phonePlaceholder: "Phone number",
     cta: "Request Sign in Code",
     disclosure: `By continuing, you'll get a one-time SMS code from GDH Appointments on ${brandName}'s behalf. Message and data rates may apply.`,
   };

@@ -28,7 +28,7 @@ export function CountrySelect({
   }, []);
 
   return (
-    <div ref={rootRef} className="relative flex-1">
+    <div ref={rootRef} className="relative w-[108px] shrink-0">
       <button
         type="button"
         aria-haspopup="listbox"
@@ -37,15 +37,15 @@ export function CountrySelect({
         onKeyDown={(e) => {
           if (e.key === "Escape") setOpen(false);
         }}
-        className="flex w-full flex-col items-start rounded-2xl border border-neutral-200 bg-white px-4 py-2.5 text-left transition focus:outline-none"
-        style={{ outlineColor: accent }}
+        className="flex w-full flex-col items-start rounded-2xl border border-neutral-200 bg-white px-3.5 py-2.5 text-left transition focus:outline-none focus:ring-2 focus:ring-offset-1"
+        style={{ ["--tw-ring-color" as string]: accent, outlineColor: accent }}
       >
         <span className="text-[11px] font-medium uppercase tracking-wide text-neutral-500">
           Country
         </span>
-        <span className="mt-0.5 flex w-full items-center justify-between gap-2">
+        <span className="mt-0.5 flex w-full items-center justify-between gap-1">
           <span className="truncate text-[15px] text-neutral-900">
-            {value.flag} {value.name} +{value.callingCode}
+            {value.flag} +{value.callingCode}
           </span>
           <svg
             width="14"
@@ -68,7 +68,7 @@ export function CountrySelect({
       {open && (
         <ul
           role="listbox"
-          className="absolute z-20 mt-1.5 max-h-64 w-full min-w-[260px] overflow-y-auto rounded-xl border border-neutral-200 bg-white py-1.5 shadow-lg"
+          className="absolute z-20 mt-1.5 max-h-64 w-[260px] overflow-y-auto rounded-xl border border-neutral-200 bg-white py-1.5 shadow-lg"
         >
           {options.map((c) => (
             <li key={c.code}>
