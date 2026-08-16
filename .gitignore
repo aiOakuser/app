@@ -37,6 +37,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# stray python venv (this is a Node app; a venv here means someone ran a
+# git command from inside a Python-venv'd shell on the EC2 box by mistake)
+/venv
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
