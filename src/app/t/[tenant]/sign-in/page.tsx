@@ -19,7 +19,7 @@ export default async function SignInPage({
     countries[0];
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-6 py-16">
+    <main className="flex min-h-screen items-center justify-center px-4 py-16 sm:px-6">
       <SignInFlow tenant={tenant} countries={countries} defaultCountry={defaultCountry} />
     </main>
   );

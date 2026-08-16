@@ -28,7 +28,7 @@ export function CountrySelect({
   }, []);
 
   return (
-    <div ref={rootRef} className="relative w-[108px] shrink-0 sm:w-[162px]">
+    <div ref={rootRef} className="relative w-[98px] shrink-0 sm:w-[162px]">
       <button
         type="button"
         aria-haspopup="listbox"

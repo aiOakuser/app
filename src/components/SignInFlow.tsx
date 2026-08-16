@@ -215,7 +215,7 @@ export function SignInFlow({
               {content.subheading}
             </p>
 
-            <div className="flex gap-2.5 sm:gap-4">
+            <div className="flex gap-2 sm:gap-4">
               <CountrySelect
                 options={countries}
                 value={country}
@@ -231,7 +231,7 @@ export function SignInFlow({
                   placeholder={content.phonePlaceholder}
                   value={phoneRaw}
                   onChange={(e) => setPhoneRaw(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                  className="h-full w-full rounded-2xl border border-neutral-200 bg-white px-4 py-3.5 text-[15px] text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-offset-1 sm:rounded-3xl sm:px-6 sm:py-5 sm:text-[23px]"
+                  className="h-full w-full rounded-2xl border border-neutral-200 bg-white px-3 py-3.5 text-[15px] text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-offset-1 sm:rounded-3xl sm:px-6 sm:py-5 sm:text-[23px]"
                   style={{ ["--tw-ring-color" as string]: tenant.accent }}
                 />
               </div>
