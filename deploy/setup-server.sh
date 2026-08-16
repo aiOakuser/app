@@ -83,7 +83,7 @@ elif [ -n "$REPO_URL" ]; then
     chown -R "$DEPLOY_USER":"$DEPLOY_USER" "$APP_DIR"
 else
     echo "No repo URL provided and no existing checkout at $APP_DIR."
-    echo "Usage: sudo ./setup-server.sh git@github.com:aiOakuser/app.git"
+    echo "Usage: sudo ./setup-server.sh https://github.com/aiOakuser/book.git"
     echo "   (or set REPO_URL in deploy/.env)"
     exit 1
 fi
