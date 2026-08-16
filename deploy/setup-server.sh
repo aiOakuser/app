@@ -51,8 +51,14 @@ apt install -y \
     curl \
     ufw
 
-echo "Ensuring Node.js is available..."
-if ! command -v node >/dev/null 2>&1; then
+echo "Ensuring Node.js >= 20 is available..."
+# Check the major version, not just presence: this box may already have an
+# older Node installed for a different app (e.g. via distro package), which
+# `command -v node` alone would treat as "good enough" and silently skip -
+# leaving `npm ci`/`next build` to fail engine checks against Next's node>=20
+# requirement.
+NODE_MAJOR="$(node -v 2>/dev/null | sed -E 's/^v([0-9]+).*/\1/')"
+if [ -z "$NODE_MAJOR" ] || [ "$NODE_MAJOR" -lt 20 ]; then
     curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
     apt install -y nodejs
 fi
