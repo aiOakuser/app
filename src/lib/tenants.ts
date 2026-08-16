@@ -1,6 +1,8 @@
 export type TenantConfig = {
   slug: string;
   displayName: string;
+  /** Optional partner-supplied logo image; falls back to a colored accent dot when unset. */
+  logoUrl?: string;
   accent: string;
   accentSoft: string;
   allowedCountries: string[];
