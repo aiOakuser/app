@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import type { CountryOption } from "@/lib/phone";
 import type { TenantConfig } from "@/lib/tenants";
@@ -185,18 +184,13 @@ export function SignInFlow({
 
   return (
     <div className="mx-auto w-full max-w-sm" style={accentStyle}>
-      <div className="mb-6 flex items-center justify-between text-[13px] text-neutral-500">
-        <span className="flex items-center gap-2">
-          <span
-            className="h-4 w-4 rounded-[5px]"
-            style={{ background: tenant.accent }}
-            aria-hidden
-          />
-          {tenant.displayName}
-        </span>
-        <Link href="/" className="text-neutral-400 hover:text-neutral-600">
-          Switch business
-        </Link>
+      <div className="mb-6 flex items-center justify-center gap-2 text-[13px] text-neutral-500">
+        <span
+          className="h-4 w-4 rounded-[5px]"
+          style={{ background: tenant.accent }}
+          aria-hidden
+        />
+        {tenant.displayName}
       </div>
 
       {step === "phone" && (

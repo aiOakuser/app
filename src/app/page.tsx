@@ -1,50 +1,28 @@
-import Link from "next/link";
-import { listTenants } from "@/lib/tenants";
+import { notFound } from "next/navigation";
+import { getTenantBySlug } from "@/lib/tenants";
+import { getAllCountries, getCountryOptions } from "@/lib/phone";
+import { SignInFlow } from "@/components/SignInFlow";
+
+// TENANT_SLUG is only reliably set on the long-running `next start` process
+// (via the systemd unit's EnvironmentFile) - the `npm run build` step during
+// deploy runs under `sudo -u <deploy_user>` without env passthrough, so a
+// statically-prerendered page would bake in the fallback tenant regardless
+// of what's configured. Force per-request rendering instead.
+export const dynamic = "force-dynamic";
 
 export default function HomePage() {
-  const tenants = listTenants();
+  const tenant = getTenantBySlug(process.env.TENANT_SLUG ?? "riverstone-dental");
+  if (!tenant) notFound();
+
+  const countries = getCountryOptions(tenant.allowedCountries);
+  const defaultCountry =
+    countries.find((c) => c.code === tenant.defaultCountry) ??
+    getAllCountries().find((c) => c.code === tenant.defaultCountry) ??
+    countries[0];
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col justify-center px-6 py-16">
-      <p className="mb-2 text-[13px] font-medium uppercase tracking-wide text-neutral-400">
-        GDH Appointments
-      </p>
-      <h1 className="mb-3 text-2xl font-semibold text-neutral-900">
-        Reference sign-in
-      </h1>
-      <p className="mb-10 max-w-md text-[15px] text-neutral-500">
-        In production a business is resolved from its subdomain or custom
-        domain. Locally, pick one to see its own branded sign-in.
-      </p>
-
-      <div className="flex flex-col gap-3">
-        {tenants.map((tenant) => (
-          <Link
-            key={tenant.slug}
-            href={`/t/${tenant.slug}/sign-in`}
-            className="group flex items-center justify-between rounded-2xl border border-neutral-200 px-5 py-4 transition hover:border-neutral-300"
-          >
-            <span className="flex items-center gap-3">
-              <span
-                className="h-8 w-8 rounded-lg"
-                style={{ background: tenant.accent }}
-                aria-hidden
-              />
-              <span>
-                <span className="block text-[15px] font-medium text-neutral-900">
-                  {tenant.displayName}
-                </span>
-                <span className="block text-[13px] text-neutral-400">
-                  {tenant.slug}.gdhappointments.com
-                </span>
-              </span>
-            </span>
-            <span className="text-neutral-300 transition group-hover:text-neutral-500">
-              →
-            </span>
-          </Link>
-        ))}
-      </div>
+    <main className="flex min-h-screen items-center justify-center px-6 py-16">
+      <SignInFlow tenant={tenant} countries={countries} defaultCountry={defaultCountry} />
     </main>
   );
 }
