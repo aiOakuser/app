@@ -1,10 +1,7 @@
 export function signInContent(brandName: string) {
   return {
-    title: (
-      <>
-        Sign in to <b>{brandName}</b> with GDH&nbsp;Appointments
-      </>
-    ),
+    heading: `Sign in to ${brandName}`,
+    subheading: "with GDH Appointments",
     countryLabel: "Country",
     phonePlaceholder: "Mobile Phone Number",
     cta: "Request Sign in Code",

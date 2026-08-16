@@ -207,9 +207,12 @@ export function SignInFlow({
 
       {step === "phone" && (
         <form onSubmit={requestCode}>
-          <h1 className="mb-6 text-center text-[22px] leading-snug font-semibold text-neutral-900">
-            {content.title}
+          <h1 className="mb-1 text-center text-[22px] leading-snug font-semibold text-neutral-900">
+            {content.heading}
           </h1>
+          <p className="mb-6 text-center text-[13px] font-medium text-neutral-400">
+            {content.subheading}
+          </p>
 
           <div className="flex flex-col gap-3 sm:flex-row">
             <CountrySelect

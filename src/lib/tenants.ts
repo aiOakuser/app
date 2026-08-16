@@ -12,7 +12,7 @@ export type TenantConfig = {
 const TENANTS: TenantConfig[] = [
   {
     slug: "riverstone-dental",
-    displayName: "Riverstone Dental",
+    displayName: "Your Business Name",
     accent: "#0e6e63",
     accentSoft: "#dcede9",
     allowedCountries: ["US", "CA"],
