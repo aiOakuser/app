@@ -61,6 +61,14 @@ export function normalizeToE164(
   }
 }
 
+export function formatNational(rawNumber: string, country: string): string {
+  try {
+    return parsePhoneNumberWithError(rawNumber, country as CountryCode).formatNational();
+  } catch {
+    return rawNumber;
+  }
+}
+
 export function maskE164(e164: string): string {
   try {
     const parsed = parsePhoneNumberWithError(e164);

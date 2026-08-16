@@ -8,7 +8,9 @@ type TenantUser = {
   id: string;
   tenantSlug: string;
   identityId: string;
-  name: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  email: string | null;
   createdAt: number;
 };
 
@@ -41,13 +43,15 @@ export function getTenantUser(
 export function createTenantUser(
   tenantSlug: string,
   identityId: string,
-  name: string | null,
+  profile: { firstName: string | null; lastName: string | null; email: string | null },
 ): TenantUser {
   const tenantUser: TenantUser = {
     id: randomUUID(),
     tenantSlug,
     identityId,
-    name,
+    firstName: profile.firstName,
+    lastName: profile.lastName,
+    email: profile.email,
     createdAt: Date.now(),
   };
   tenantUsersByKey.set(tenantUserKey(tenantSlug, identityId), tenantUser);

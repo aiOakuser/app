@@ -31,5 +31,7 @@ export const errorMessages: Record<string, string> = {
   cooldown: "Please wait before requesting another code.",
   max_resends: "You've reached the resend limit. Request a new code from the previous screen.",
   not_verified: "Your code verification expired. Start over.",
+  invalid_profile: "Enter your first and last name.",
+  invalid_email: "Enter a valid email address.",
   network: "Something went wrong. Check your connection and try again.",
 };

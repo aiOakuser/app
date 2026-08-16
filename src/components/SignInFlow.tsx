@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { isValidPhoneNumber } from "libphonenumber-js";
+import { formatNational } from "@/lib/phone";
 import type { CountryOption } from "@/lib/phone";
 import type { TenantConfig } from "@/lib/tenants";
 import { CountrySelect } from "@/components/CountrySelect";
@@ -32,7 +33,9 @@ export function SignInFlow({
   const [otpError, setOtpError] = useState<string | null>(null);
   const [resendSeconds, setResendSeconds] = useState(0);
 
-  const [profileName, setProfileName] = useState("");
+  const [profileFirstName, setProfileFirstName] = useState("");
+  const [profileLastName, setProfileLastName] = useState("");
+  const [profileEmail, setProfileEmail] = useState("");
   const [profileError, setProfileError] = useState<string | null>(null);
 
   const content = signInContent(tenant.displayName);
@@ -162,13 +165,24 @@ export function SignInFlow({
   async function completeProfile(e: React.FormEvent) {
     e.preventDefault();
     if (!challengeId) return;
-    setLoading(true);
     setProfileError(null);
+
+    if (profileEmail.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profileEmail.trim())) {
+      setProfileError(errorMessages.invalid_email);
+      return;
+    }
+
+    setLoading(true);
     try {
       const res = await fetch("/api/auth/profile/complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ challengeId, name: profileName }),
+        body: JSON.stringify({
+          challengeId,
+          firstName: profileFirstName,
+          lastName: profileLastName,
+          email: profileEmail,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -336,22 +350,74 @@ export function SignInFlow({
 
         {step === "profile" && (
           <form onSubmit={completeProfile}>
-            <h1 className="mb-2 text-[22px] leading-snug font-semibold text-neutral-900 sm:mb-3 sm:text-[33px]">
-              You&rsquo;re verified — what should we call you?
+            <h1 className="mb-2 text-center text-[22px] leading-snug font-semibold text-neutral-900 sm:mb-3 sm:text-[33px]">
+              Complete your profile
             </h1>
-            <p className="mb-5 text-[13.5px] text-neutral-500 sm:mb-8 sm:text-[20px]">
-              First visit to {tenant.displayName} on GDH Appointments. No password needed.
+            <p className="mb-5 text-center text-[13.5px] text-neutral-500 sm:mb-6 sm:text-[20px]">
+              Looks like you&rsquo;ve booked with GDH Appointments before. Please complete your profile to
+              view your account with {tenant.displayName}.
             </p>
 
-            <input
-              type="text"
-              autoFocus
-              placeholder="Full name"
-              value={profileName}
-              onChange={(e) => setProfileName(e.target.value)}
-              className="w-full rounded-2xl border border-neutral-200 bg-white px-4 py-3.5 text-[15px] text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-offset-1 sm:rounded-3xl sm:px-6 sm:py-5 sm:text-[23px]"
-              style={{ ["--tw-ring-color" as string]: tenant.accent }}
-            />
+            <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
+              <div className="flex w-full shrink-0 flex-col items-start rounded-2xl border border-neutral-200 bg-neutral-50 px-3.5 py-2.5 text-left sm:w-[162px] sm:rounded-3xl sm:px-5 sm:py-4">
+                <span className="text-[11px] font-medium uppercase tracking-wide text-neutral-400 sm:text-[17px]">
+                  Country
+                </span>
+                <span className="mt-0.5 text-[15px] text-neutral-500 sm:mt-1 sm:text-[23px]">
+                  {country.flag} +{country.callingCode}
+                </span>
+              </div>
+              <div className="min-w-0 flex-1 rounded-2xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 sm:rounded-3xl sm:px-6 sm:py-4">
+                <span className="block text-[11px] font-medium uppercase tracking-wide text-neutral-400 sm:text-[17px]">
+                  Phone number
+                </span>
+                <span className="mt-0.5 block truncate text-[15px] text-neutral-500 sm:mt-1 sm:text-[23px]">
+                  {formatNational(phoneRaw, country.code)}
+                </span>
+              </div>
+            </div>
+
+            <p className="mb-5 mt-2 text-[13px] text-neutral-500 sm:mb-8 sm:mt-3 sm:text-[20px]">
+              Not your phone number?{" "}
+              <button
+                type="button"
+                onClick={() => setStep("phone")}
+                className="font-semibold text-neutral-900 underline"
+              >
+                Change phone number
+              </button>
+            </p>
+
+            <div className="flex flex-col gap-2 sm:gap-3">
+              <input
+                type="text"
+                autoFocus
+                autoComplete="given-name"
+                placeholder="First name"
+                value={profileFirstName}
+                onChange={(e) => setProfileFirstName(e.target.value)}
+                className="w-full rounded-2xl border border-neutral-200 bg-white px-4 py-3.5 text-[15px] text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-offset-1 sm:rounded-3xl sm:px-6 sm:py-5 sm:text-[23px]"
+                style={{ ["--tw-ring-color" as string]: tenant.accent }}
+              />
+              <input
+                type="text"
+                autoComplete="family-name"
+                placeholder="Last name"
+                value={profileLastName}
+                onChange={(e) => setProfileLastName(e.target.value)}
+                className="w-full rounded-2xl border border-neutral-200 bg-white px-4 py-3.5 text-[15px] text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-offset-1 sm:rounded-3xl sm:px-6 sm:py-5 sm:text-[23px]"
+                style={{ ["--tw-ring-color" as string]: tenant.accent }}
+              />
+              <input
+                type="email"
+                autoComplete="email"
+                placeholder="Email"
+                value={profileEmail}
+                onChange={(e) => setProfileEmail(e.target.value)}
+                className="w-full rounded-2xl border border-neutral-200 bg-white px-4 py-3.5 text-[15px] text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-offset-1 sm:rounded-3xl sm:px-6 sm:py-5 sm:text-[23px]"
+                style={{ ["--tw-ring-color" as string]: tenant.accent }}
+              />
+            </div>
 
             {profileError && (
               <p className="mt-2 text-[13px] text-red-600 sm:mt-3 sm:text-[20px]" role="alert">
@@ -361,11 +427,11 @@ export function SignInFlow({
 
             <button
               type="submit"
-              disabled={loading || profileName.trim() === ""}
+              disabled={loading || profileFirstName.trim() === "" || profileLastName.trim() === ""}
               className="mt-4 w-full rounded-full py-3.5 text-[15px] font-semibold text-white transition hover:brightness-110 disabled:opacity-40 sm:mt-6 sm:py-5 sm:text-[23px]"
               style={{ background: tenant.accent }}
             >
-              {loading ? "Finishing…" : "Finish sign in"}
+              {loading ? "Saving…" : "Save and view account"}
             </button>
           </form>
         )}
