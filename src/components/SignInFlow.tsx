@@ -268,9 +268,12 @@ export function SignInFlow({
               ← {otpContent(phoneMasked).changeNumber}
             </button>
 
-            <h1 className="mb-5 text-[22px] leading-snug font-semibold text-neutral-900 sm:mb-8 sm:text-[33px]">
-              {otpContent(phoneMasked).title}
+            <h1 className="mb-1 text-[22px] leading-snug font-semibold text-neutral-900 sm:mb-1.5 sm:text-[33px]">
+              {otpContent(phoneMasked).heading}
             </h1>
+            <p className="mb-5 text-[13px] font-medium text-neutral-400 sm:mb-8 sm:text-[20px]">
+              {otpContent(phoneMasked).subheading}
+            </p>
 
             {devCode && (
               <p className="mb-4 rounded-lg bg-amber-50 px-3 py-2 text-[12.5px] text-amber-800 sm:mb-6 sm:px-4 sm:py-3 sm:text-[19px]">

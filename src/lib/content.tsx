@@ -11,11 +11,8 @@ export function signInContent(brandName: string) {
 
 export function otpContent(phoneMasked: string) {
   return {
-    title: (
-      <>
-        Enter the code we sent to <b>{phoneMasked}</b>
-      </>
-    ),
+    heading: "Enter your code",
+    subheading: `Sent to ${phoneMasked}`,
     cta: "Verify & sign in",
     changeNumber: "Change number",
     resendReady: "Resend code",
