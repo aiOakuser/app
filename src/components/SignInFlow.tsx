@@ -184,8 +184,8 @@ export function SignInFlow({
   const accentStyle = { ["--accent" as string]: tenant.accent };
 
   return (
-    <div className="mx-auto w-full max-w-xl" style={accentStyle}>
-      <div className="mb-8 flex items-center justify-center gap-3 text-[20px] font-medium text-neutral-500">
+    <div className="mx-auto w-full max-w-sm sm:max-w-xl" style={accentStyle}>
+      <div className="mb-5 flex items-center justify-center gap-2 text-[13px] font-medium text-neutral-500 sm:mb-8 sm:gap-3 sm:text-[20px]">
         {tenant.logoUrl ? (
           <Image
             src={tenant.logoUrl}
@@ -193,11 +193,11 @@ export function SignInFlow({
             width={27}
             height={27}
             unoptimized
-            className="h-[27px] w-[27px] rounded-[8px] object-contain"
+            className="h-[18px] w-[18px] rounded-[5px] object-contain sm:h-[27px] sm:w-[27px] sm:rounded-[8px]"
           />
         ) : (
           <span
-            className="h-[27px] w-[27px] rounded-[9px]"
+            className="h-[18px] w-[18px] rounded-[6px] sm:h-[27px] sm:w-[27px] sm:rounded-[9px]"
             style={{ background: tenant.accent }}
             aria-hidden
           />
@@ -205,17 +205,17 @@ export function SignInFlow({
         {tenant.displayName}
       </div>
 
-      <div className="rounded-[36px] border border-neutral-200 bg-white p-9 shadow-[0_1px_2px_rgba(0,0,0,0.03),0_12px_28px_-16px_rgba(0,0,0,0.12)] sm:p-12">
+      <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-[0_1px_2px_rgba(0,0,0,0.03),0_12px_28px_-16px_rgba(0,0,0,0.12)] sm:rounded-[36px] sm:p-12">
         {step === "phone" && (
           <form onSubmit={requestCode}>
-            <h1 className="mb-1.5 text-center text-[33px] leading-snug font-semibold text-neutral-900">
+            <h1 className="mb-1 text-center text-[22px] leading-snug font-semibold text-neutral-900 sm:mb-1.5 sm:text-[33px]">
               {content.heading}
             </h1>
-            <p className="mb-9 text-center text-[20px] font-medium text-neutral-400">
+            <p className="mb-6 text-center text-[13px] font-medium text-neutral-400 sm:mb-9 sm:text-[20px]">
               {content.subheading}
             </p>
 
-            <div className="flex gap-4">
+            <div className="flex gap-2.5 sm:gap-4">
               <CountrySelect
                 options={countries}
                 value={country}
@@ -227,17 +227,18 @@ export function SignInFlow({
                   type="tel"
                   inputMode="tel"
                   autoComplete="tel-national"
+                  maxLength={10}
                   placeholder={content.phonePlaceholder}
                   value={phoneRaw}
-                  onChange={(e) => setPhoneRaw(e.target.value)}
-                  className="h-full w-full rounded-3xl border border-neutral-200 bg-white px-6 py-5 text-[23px] text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-offset-1"
+                  onChange={(e) => setPhoneRaw(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                  className="h-full w-full rounded-2xl border border-neutral-200 bg-white px-4 py-3.5 text-[15px] text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-offset-1 sm:rounded-3xl sm:px-6 sm:py-5 sm:text-[23px]"
                   style={{ ["--tw-ring-color" as string]: tenant.accent }}
                 />
               </div>
             </div>
 
             {phoneError && (
-              <p className="mt-3 text-[20px] text-red-600" role="alert">
+              <p className="mt-2 text-[13px] text-red-600 sm:mt-3 sm:text-[20px]" role="alert">
                 {phoneError}
               </p>
             )}
@@ -245,13 +246,13 @@ export function SignInFlow({
             <button
               type="submit"
               disabled={loading || phoneRaw.trim() === ""}
-              className="mt-8 w-full rounded-full py-5 text-[23px] font-semibold text-white transition hover:brightness-110 disabled:opacity-40"
+              className="mt-4 w-full rounded-full py-3.5 text-[15px] font-semibold text-white transition hover:brightness-110 disabled:opacity-40 sm:mt-8 sm:py-5 sm:text-[23px]"
               style={{ background: tenant.accent }}
             >
               {loading ? "Sending…" : content.cta}
             </button>
 
-            <p className="mt-6 text-center text-[18px] leading-relaxed text-neutral-400">
+            <p className="mt-4 text-center text-[12px] leading-relaxed text-neutral-400 sm:mt-6 sm:text-[18px]">
               {content.disclosure}
             </p>
           </form>
@@ -262,22 +263,22 @@ export function SignInFlow({
             <button
               type="button"
               onClick={() => setStep("phone")}
-              className="mb-6 text-[20px] text-neutral-500 hover:text-neutral-700"
+              className="mb-4 text-[13px] text-neutral-500 hover:text-neutral-700 sm:mb-6 sm:text-[20px]"
             >
               ← {otpContent(phoneMasked).changeNumber}
             </button>
 
-            <h1 className="mb-8 text-[33px] leading-snug font-semibold text-neutral-900">
+            <h1 className="mb-5 text-[22px] leading-snug font-semibold text-neutral-900 sm:mb-8 sm:text-[33px]">
               {otpContent(phoneMasked).title}
             </h1>
 
             {devCode && (
-              <p className="mb-6 rounded-lg bg-amber-50 px-4 py-3 text-[19px] text-amber-800">
+              <p className="mb-4 rounded-lg bg-amber-50 px-3 py-2 text-[12.5px] text-amber-800 sm:mb-6 sm:px-4 sm:py-3 sm:text-[19px]">
                 Dev mode — no SMS provider connected. Your code is <b>{devCode}</b>.
               </p>
             )}
 
-            <div className="flex gap-3">
+            <div className="flex gap-2 sm:gap-3">
               {otpDigits.map((digit, i) => (
                 <input
                   key={i}
@@ -291,7 +292,7 @@ export function SignInFlow({
                   inputMode="numeric"
                   maxLength={1}
                   aria-label={`Digit ${i + 1}`}
-                  className="aspect-square w-full rounded-3xl border text-center text-[27px] font-medium text-neutral-900 focus:outline-none focus:ring-2 focus:ring-offset-1"
+                  className="aspect-square w-full rounded-2xl border text-center text-[18px] font-medium text-neutral-900 focus:outline-none focus:ring-2 focus:ring-offset-1 sm:rounded-3xl sm:text-[27px]"
                   style={{
                     borderColor: digit ? tenant.accent : "#e5e5e5",
                     ["--tw-ring-color" as string]: tenant.accent,
@@ -301,7 +302,7 @@ export function SignInFlow({
             </div>
 
             {otpError && (
-              <p className="mt-4 text-[20px] text-red-600" role="alert">
+              <p className="mt-3 text-[13px] text-red-600 sm:mt-4 sm:text-[20px]" role="alert">
                 {otpError}
               </p>
             )}
@@ -310,13 +311,13 @@ export function SignInFlow({
               type="button"
               onClick={() => submitCode(otpDigits.join(""))}
               disabled={loading || otpDigits.some((d) => d === "")}
-              className="mt-8 w-full rounded-full py-5 text-[23px] font-semibold text-white transition hover:brightness-110 disabled:opacity-40"
+              className="mt-5 w-full rounded-full py-3.5 text-[15px] font-semibold text-white transition hover:brightness-110 disabled:opacity-40 sm:mt-8 sm:py-5 sm:text-[23px]"
               style={{ background: tenant.accent }}
             >
               {loading ? "Verifying…" : otpContent(phoneMasked).cta}
             </button>
 
-            <p className="mt-6 text-center text-[20px] text-neutral-500">
+            <p className="mt-4 text-center text-[13px] text-neutral-500 sm:mt-6 sm:text-[20px]">
               {resendSeconds > 0 ? (
                 <>Resend code in 0:{String(resendSeconds).padStart(2, "0")}</>
               ) : (
@@ -330,10 +331,10 @@ export function SignInFlow({
 
         {step === "profile" && (
           <form onSubmit={completeProfile}>
-            <h1 className="mb-3 text-[33px] leading-snug font-semibold text-neutral-900">
+            <h1 className="mb-2 text-[22px] leading-snug font-semibold text-neutral-900 sm:mb-3 sm:text-[33px]">
               You&rsquo;re verified — what should we call you?
             </h1>
-            <p className="mb-8 text-[20px] text-neutral-500">
+            <p className="mb-5 text-[13.5px] text-neutral-500 sm:mb-8 sm:text-[20px]">
               First visit to {tenant.displayName} on GDH Appointments. No password needed.
             </p>
 
@@ -343,12 +344,12 @@ export function SignInFlow({
               placeholder="Full name"
               value={profileName}
               onChange={(e) => setProfileName(e.target.value)}
-              className="w-full rounded-3xl border border-neutral-200 bg-white px-6 py-5 text-[23px] text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-offset-1"
+              className="w-full rounded-2xl border border-neutral-200 bg-white px-4 py-3.5 text-[15px] text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-offset-1 sm:rounded-3xl sm:px-6 sm:py-5 sm:text-[23px]"
               style={{ ["--tw-ring-color" as string]: tenant.accent }}
             />
 
             {profileError && (
-              <p className="mt-3 text-[20px] text-red-600" role="alert">
+              <p className="mt-2 text-[13px] text-red-600 sm:mt-3 sm:text-[20px]" role="alert">
                 {profileError}
               </p>
             )}
@@ -356,7 +357,7 @@ export function SignInFlow({
             <button
               type="submit"
               disabled={loading || profileName.trim() === ""}
-              className="mt-6 w-full rounded-full py-5 text-[23px] font-semibold text-white transition hover:brightness-110 disabled:opacity-40"
+              className="mt-4 w-full rounded-full py-3.5 text-[15px] font-semibold text-white transition hover:brightness-110 disabled:opacity-40 sm:mt-6 sm:py-5 sm:text-[23px]"
               style={{ background: tenant.accent }}
             >
               {loading ? "Finishing…" : "Finish sign in"}
