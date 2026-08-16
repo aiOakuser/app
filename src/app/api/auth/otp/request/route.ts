@@ -33,7 +33,12 @@ export async function POST(request: Request) {
   }
 
   const { challenge, code } = createChallenge(tenantSlug, phoneE164);
-  await sendOtpSms(phoneE164, code, tenant.displayName);
+  try {
+    await sendOtpSms(phoneE164, code, tenant.displayName);
+  } catch (err) {
+    console.error("[sms] failed to send OTP:", err);
+    return NextResponse.json({ error: "sms_failed" }, { status: 502 });
+  }
 
   return NextResponse.json({
     challengeId: challenge.id,

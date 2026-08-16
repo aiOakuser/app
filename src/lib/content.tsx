@@ -24,6 +24,7 @@ export const errorMessages: Record<string, string> = {
   country_not_supported: "This country isn't supported for this account yet.",
   unknown_tenant: "We couldn't find that business.",
   rate_limited: "Too many attempts. Try again in a few minutes.",
+  sms_failed: "We couldn't send the code. Check the number and try again.",
   invalid: "That code isn't right.",
   expired: "This code expired. Request a new one.",
   too_many_attempts: "Too many incorrect attempts. Request a new code.",
