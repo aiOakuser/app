@@ -25,7 +25,7 @@ fi
 
 APP_NAME="${APP_NAME:-app}"
 APP_DIR="${APP_DIR:-/var/www/app}"
-DOMAIN="${DOMAIN:-app.globaldesignerhub.com}"
+DOMAIN="${DOMAIN:-app.aioak.io}"
 DEPLOY_USER="${DEPLOY_USER:-ubuntu}"
 CERTBOT_EMAIL="${CERTBOT_EMAIL:-}"
 PORT="${PORT:-8003}"

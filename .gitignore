@@ -22,7 +22,21 @@
 
 # misc
 .DS_Store
+
+# secrets & credentials: certs, private keys, cloud/service-account creds
 *.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+*.tfstate
+*.tfstate.*
+service-account*.json
+credentials.json
+/secrets/
 
 # debug
 npm-debug.log*
@@ -44,3 +58,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.claude
+.vscode
+.env
