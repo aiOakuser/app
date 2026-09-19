@@ -21,7 +21,9 @@ export async function sendOtpSms(
   const body = `${code} is your ${brandName} sign-in code. It expires in 5 minutes.`;
 
   if (!client || !fromNumber) {
-    console.log(`[sms] to=${phoneE164} from="${brandName} via GDH Appointments" body="${body}"`);
+    console.log(
+      `[sms] to=${phoneE164} from="${brandName} via {brand_name} Appointments" body="${body}"`,
+    );
     return;
   }
 

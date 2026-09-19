@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "GDH Appointments — Sign in",
+  title: "{brand_name} Appointments — Sign in",
   description: "White-label phone sign-in reference implementation",
 };
 

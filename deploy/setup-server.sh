@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================
-# app.gdh - EC2 Server Setup Script
+# app.{brand_name} - EC2 Server Setup Script
 # Next.js app, built with `next build` and run with `next start` on
 # 127.0.0.1:$PORT via systemd, that Nginx reverse-proxies to.
 # Run this ONCE on a fresh Ubuntu 24.04 EC2 instance.
