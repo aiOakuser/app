@@ -1,11 +1,11 @@
 export function signInContent(brandName: string) {
   return {
     heading: `Sign in to ${brandName}`,
-    subheading: "with GDH Appointments",
+    subheading: "with {brand_name} Appointments",
     countryLabel: "Country",
     phonePlaceholder: "Phone number",
     cta: "Request Sign in Code",
-    disclosure: `By continuing, you'll get a one-time SMS code from GDH Appointments on ${brandName}'s behalf. Message and data rates may apply.`,
+    disclosure: `By continuing, you'll get a one-time SMS code from {brand_name} Appointments on ${brandName}'s behalf. Message and data rates may apply.`,
   };
 }
 
@@ -30,7 +30,8 @@ export const errorMessages: Record<string, string> = {
   too_many_attempts: "Too many incorrect attempts. Request a new code.",
   not_found: "This code has expired. Request a new one.",
   cooldown: "Please wait before requesting another code.",
-  max_resends: "You've reached the resend limit. Request a new code from the previous screen.",
+  max_resends:
+    "You've reached the resend limit. Request a new code from the previous screen.",
   not_verified: "Your code verification expired. Start over.",
   invalid_profile: "Enter your first and last name.",
   invalid_email: "Enter a valid email address.",

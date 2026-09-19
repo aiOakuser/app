@@ -1,6 +1,6 @@
 import { SignJWT, jwtVerify } from "jose";
 
-export const SESSION_COOKIE = "gdh_session";
+export const SESSION_COOKIE = "{brand_name}_session";
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7; // 7 days — a production build would
 // split this into a short-lived access token plus a rotating refresh token.
 
@@ -9,7 +9,8 @@ const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7; // 7 days — a production build w
 // Next.js dev, so a *generated* per-process secret (e.g. random bytes at import
 // time) ends up different in each — tokens signed in one layer fail to verify in
 // the other. A constant sidesteps that; set AUTH_SECRET for anything beyond local dev.
-const secretString = process.env.AUTH_SECRET ?? "dev-only-insecure-secret-do-not-deploy";
+const secretString =
+  process.env.AUTH_SECRET ?? "dev-only-insecure-secret-do-not-deploy";
 if (!process.env.AUTH_SECRET) {
   console.warn(
     "[auth] AUTH_SECRET is not set — using a fixed, insecure dev secret. Set AUTH_SECRET before deploying.",

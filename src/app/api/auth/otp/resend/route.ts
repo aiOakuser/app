@@ -5,7 +5,8 @@ import { sendOtpSms } from "@/lib/sms";
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
-  const challengeId = typeof body?.challengeId === "string" ? body.challengeId : "";
+  const challengeId =
+    typeof body?.challengeId === "string" ? body.challengeId : "";
 
   const existing = getChallenge(challengeId);
   if (!existing) {
@@ -14,12 +15,18 @@ export async function POST(request: Request) {
 
   const result = resendChallenge(challengeId);
   if (!result.ok) {
-    const status = { cooldown: 429, max_resends: 429, not_found: 404 }[result.reason];
+    const status = { cooldown: 429, max_resends: 429, not_found: 404 }[
+      result.reason
+    ];
     return NextResponse.json({ error: result.reason }, { status });
   }
 
   const tenant = getTenantBySlug(existing.tenantSlug);
-  await sendOtpSms(existing.phoneE164, result.code, tenant?.displayName ?? "GDH Appointments");
+  await sendOtpSms(
+    existing.phoneE164,
+    result.code,
+    tenant?.displayName ?? "{brand_name} Appointments",
+  );
 
   return NextResponse.json({
     expiresInSec: OTP_LIMITS.CODE_TTL_MS / 1000,

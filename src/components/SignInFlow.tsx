@@ -43,7 +43,10 @@ export function SignInFlow({
 
   useEffect(() => {
     if (resendSeconds <= 0) return;
-    const id = setInterval(() => setResendSeconds((s) => Math.max(0, s - 1)), 1000);
+    const id = setInterval(
+      () => setResendSeconds((s) => Math.max(0, s - 1)),
+      1000,
+    );
     return () => clearInterval(id);
   }, [resendSeconds]);
 
@@ -61,7 +64,11 @@ export function SignInFlow({
       const res = await fetch("/api/auth/otp/request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tenantSlug: tenant.slug, country: country.code, phone: phoneRaw }),
+        body: JSON.stringify({
+          tenantSlug: tenant.slug,
+          country: country.code,
+          phone: phoneRaw,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -121,14 +128,20 @@ export function SignInFlow({
     if (next.every((d) => d !== "")) submitCode(next.join(""));
   }
 
-  function onDigitKeyDown(index: number, e: React.KeyboardEvent<HTMLInputElement>) {
+  function onDigitKeyDown(
+    index: number,
+    e: React.KeyboardEvent<HTMLInputElement>,
+  ) {
     if (e.key === "Backspace" && !otpDigits[index] && index > 0) {
       otpBoxRefs.current[index - 1]?.focus();
     }
   }
 
   function onDigitPaste(e: React.ClipboardEvent<HTMLInputElement>) {
-    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    const pasted = e.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .slice(0, 6);
     if (!pasted) return;
     e.preventDefault();
     const next = Array(6).fill("");
@@ -167,7 +180,10 @@ export function SignInFlow({
     if (!challengeId) return;
     setProfileError(null);
 
-    if (profileEmail.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profileEmail.trim())) {
+    if (
+      profileEmail.trim() &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profileEmail.trim())
+    ) {
       setProfileError(errorMessages.invalid_email);
       return;
     }
@@ -246,7 +262,9 @@ export function SignInFlow({
                   maxLength={10}
                   placeholder={content.phonePlaceholder}
                   value={phoneRaw}
-                  onChange={(e) => setPhoneRaw(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                  onChange={(e) =>
+                    setPhoneRaw(e.target.value.replace(/\D/g, "").slice(0, 10))
+                  }
                   className="h-full w-full rounded-2xl border border-neutral-200 bg-white px-4 py-3.5 text-[15px] text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-offset-1 sm:rounded-3xl sm:px-6 sm:py-5 sm:text-[23px]"
                   style={{ ["--tw-ring-color" as string]: tenant.accent }}
                 />
@@ -254,7 +272,10 @@ export function SignInFlow({
             </div>
 
             {phoneError && (
-              <p className="mt-2 text-[13px] text-red-600 sm:mt-3 sm:text-[20px]" role="alert">
+              <p
+                className="mt-2 text-[13px] text-red-600 sm:mt-3 sm:text-[20px]"
+                role="alert"
+              >
                 {phoneError}
               </p>
             )}
@@ -293,7 +314,8 @@ export function SignInFlow({
 
             {devCode && (
               <p className="mb-4 rounded-lg bg-amber-50 px-3 py-2 text-[12.5px] text-amber-800 sm:mb-6 sm:px-4 sm:py-3 sm:text-[19px]">
-                Dev mode — no SMS provider connected. Your code is <b>{devCode}</b>.
+                Dev mode — no SMS provider connected. Your code is{" "}
+                <b>{devCode}</b>.
               </p>
             )}
 
@@ -321,7 +343,10 @@ export function SignInFlow({
             </div>
 
             {otpError && (
-              <p className="mt-3 text-[13px] text-red-600 sm:mt-4 sm:text-[20px]" role="alert">
+              <p
+                className="mt-3 text-[13px] text-red-600 sm:mt-4 sm:text-[20px]"
+                role="alert"
+              >
                 {otpError}
               </p>
             )}
@@ -340,7 +365,11 @@ export function SignInFlow({
               {resendSeconds > 0 ? (
                 <>Resend code in 0:{String(resendSeconds).padStart(2, "0")}</>
               ) : (
-                <button type="button" onClick={resend} className="font-medium text-neutral-700 underline">
+                <button
+                  type="button"
+                  onClick={resend}
+                  className="font-medium text-neutral-700 underline"
+                >
                   {otpContent(phoneMasked).resendReady}
                 </button>
               )}
@@ -354,8 +383,9 @@ export function SignInFlow({
               Complete your profile
             </h1>
             <p className="mb-5 text-center text-[13.5px] text-neutral-500 sm:mb-6 sm:text-[20px]">
-              Looks like you&rsquo;ve booked with GDH Appointments before. Please complete your profile to
-              view your account with {tenant.displayName}.
+              Looks like you&rsquo;ve booked with {brand_name} Appointments
+              before. Please complete your profile to view your account with{" "}
+              {tenant.displayName}.
             </p>
 
             <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
@@ -420,14 +450,21 @@ export function SignInFlow({
             </div>
 
             {profileError && (
-              <p className="mt-2 text-[13px] text-red-600 sm:mt-3 sm:text-[20px]" role="alert">
+              <p
+                className="mt-2 text-[13px] text-red-600 sm:mt-3 sm:text-[20px]"
+                role="alert"
+              >
                 {profileError}
               </p>
             )}
 
             <button
               type="submit"
-              disabled={loading || profileFirstName.trim() === "" || profileLastName.trim() === ""}
+              disabled={
+                loading ||
+                profileFirstName.trim() === "" ||
+                profileLastName.trim() === ""
+              }
               className="mt-4 w-full rounded-full py-3.5 text-[15px] font-semibold text-white transition hover:brightness-110 disabled:opacity-40 sm:mt-6 sm:py-5 sm:text-[23px]"
               style={{ background: tenant.accent }}
             >
