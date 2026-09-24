@@ -3,18 +3,18 @@
 This site runs as a long-lived Next.js server (`next start`), managed by
 systemd and reverse-proxied by Nginx — not a static export.
 
-| Item            | Value                                                                       |
-| --------------- | --------------------------------------------------------------------------- |
-| URL             | `https://app.aioak.io` (behind Cloudflare)                                  |
-| Host            | AWS EC2, Ubuntu                                                             |
-| App directory   | `/var/www/app` (repo checkout, built in place)                 |
-| Branch deployed | `master`                                                                    |
-| Service         | `app.service`, runs as `www-data`, listens on `127.0.0.1:8015` |
-| Nginx site      | `/etc/nginx/sites-available/app`                               |
-| Node            | 22, installed at `/opt/nodejs22` (the system Node is too old for Next 16)   |
+| Item            | Value                                                                     |
+| --------------- | ------------------------------------------------------------------------- |
+| URL             | `https://app.aioak.io` (behind Cloudflare)                                |
+| Host            | AWS EC2, Ubuntu                                                           |
+| App directory   | `/var/www/app` (repo checkout, built in place)                            |
+| Branch deployed | `master`                                                                  |
+| Service         | `app.service`, runs as `www-data`, listens on `127.0.0.1:8003`            |
+| Nginx site      | `/etc/nginx/sites-available/app`                                          |
+| Node            | 22, installed at `/opt/nodejs22` (the system Node is too old for Next 16) |
 
 Request path: browser → Cloudflare (proxied, SSL mode _Full (strict)_) →
-Nginx on `:443` (Cloudflare Origin CA cert) → Next.js on `127.0.0.1:8015`.
+Nginx on `:443` (Cloudflare Origin CA cert) → Next.js on `127.0.0.1:8003`.
 
 ## Deploy a change (git push → live)
 
@@ -53,7 +53,7 @@ sudo systemctl restart app
 
 ```bash
 sudo systemctl is-active app            # active
-curl -sI http://127.0.0.1:8015 | head -1             # HTTP/1.1 200 OK  (the app)
+curl -sI http://127.0.0.1:8003 | head -1             # HTTP/1.1 200 OK  (the app)
 curl -I https://app.aioak.io         # 200 (through Cloudflare + Nginx)
 ```
 
@@ -138,7 +138,7 @@ User=www-data
 Group=www-data
 WorkingDirectory=/var/www/app
 Environment=NODE_ENV=production
-Environment=PORT=8015
+Environment=PORT=8003
 Environment=HOSTNAME=127.0.0.1
 Environment=PATH=/opt/nodejs22/bin:/usr/local/bin:/usr/bin:/bin
 ExecStart=/opt/nodejs22/bin/npm start
@@ -153,7 +153,7 @@ sudo systemctl enable --now app
 ```
 
 `npm start` runs `next start`, which serves the `.next` build. The app only
-listens on `127.0.0.1:8015`; it is reachable only through Nginx. Run
+listens on `127.0.0.1:8003`; it is reachable only through Nginx. Run
 `sudo systemctl daemon-reload` after any edit to the unit file.
 
 ### 6. Origin certificate and Nginx
@@ -165,11 +165,11 @@ commit it.
 
 ```bash
 sudo mkdir -p /etc/nginx/ssl
-sudo nano /etc/nginx/ssl/mazurio-origin.crt     # paste certificate
-sudo nano /etc/nginx/ssl/mazurio-origin.key     # paste private key
-sudo chown root:root /etc/nginx/ssl/mazurio-origin.*
-sudo chmod 644 /etc/nginx/ssl/mazurio-origin.crt
-sudo chmod 600 /etc/nginx/ssl/mazurio-origin.key
+sudo nano /etc/nginx/ssl/aioak-origin.crt     # paste certificate
+sudo nano /etc/nginx/ssl/aioak-origin.key     # paste private key
+sudo chown root:root /etc/nginx/ssl/aioak-origin.*
+sudo chmod 644 /etc/nginx/ssl/aioak-origin.crt
+sudo chmod 600 /etc/nginx/ssl/aioak-origin.key
 ```
 
 Then the site config:
@@ -189,8 +189,8 @@ server {
     listen [::]:443 ssl http2;
     server_name app.aioak.io;
 
-    ssl_certificate     /etc/nginx/ssl/mazurio-origin.crt;
-    ssl_certificate_key /etc/nginx/ssl/mazurio-origin.key;
+    ssl_certificate     /etc/nginx/ssl/aioak-origin.crt;
+    ssl_certificate_key /etc/nginx/ssl/aioak-origin.key;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_prefer_server_ciphers off;
     ssl_session_cache shared:SSL:10m;
@@ -204,7 +204,7 @@ server {
     gzip_types text/plain text/css application/javascript application/json image/svg+xml;
 
     location / {
-        proxy_pass http://127.0.0.1:8015;
+        proxy_pass http://127.0.0.1:8003;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -240,7 +240,7 @@ label, so a `www.` name under it would not match the certificate.
 | Symptom                                            | Likely cause and fix                                                                                               |
 | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | `DNS_PROBE_FINISHED_NXDOMAIN`                      | No DNS record. Add the Cloudflare `A` record (step 7); flush the local cache with `ipconfig /flushdns` on Windows. |
-| Cloudflare 502, or Nginx "502 Bad Gateway"         | The app isn't running on `:8015`. Check `journalctl -u app`; usually a missing or failed build.       |
+| Cloudflare 502, or Nginx "502 Bad Gateway"         | The app isn't running on `:8003`. Check `journalctl -u app`; usually a missing or failed build.                    |
 | Cloudflare 521 / 522                               | Nothing accepting connections on 443. Check `ss -ltnp` and that the Nginx site is symlinked into `sites-enabled`.  |
 | Cloudflare 525 / 526                               | Origin certificate missing or invalid, or SSL mode doesn't match. Confirm the `/etc/nginx/ssl/` files exist.       |
 | Service `status=203/EXEC`                          | systemd can't run `/opt/nodejs22/bin/npm`; Node 22 isn't installed there (setup step 2).                           |
@@ -248,7 +248,7 @@ label, so a `www.` name under it would not match the certificate.
 | `Unit file … changed on disk`                      | Run `sudo systemctl daemon-reload`.                                                                                |
 | `nginx -t`: cannot load certificate                | The cert or key file is missing from `/etc/nginx/ssl/`.                                                            |
 | `Killed`, then `next: not found`                   | Out-of-memory kill left `node_modules` incomplete (service exits 127). Add swap (setup step 4), rerun `npm ci`.    |
-| `EACCES` during `npm ci`                           | Root-owned files from an earlier run; `sudo chown -R www-data:www-data /var/www/app /var/www/.npm`.   |
+| `EACCES` during `npm ci`                           | Root-owned files from an earlier run; `sudo chown -R www-data:www-data /var/www/app /var/www/.npm`.                |
 
 `systemctl status` opens a pager; press `q` to leave it, or add `--no-pager`.
 
