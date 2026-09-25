@@ -285,19 +285,25 @@ EOF
     # Check what Cloudflare will actually see. Any failure here is a 526.
     openssl x509 -in "$CERT" -noout >/dev/null 2>&1 \
         || die "$CERT is not a valid PEM certificate (paste only the -----BEGIN/END CERTIFICATE----- block)"
+    TLS_WARNINGS_BEFORE="${#PENDING[@]}"
     if ! openssl x509 -in "$CERT" -noout -checkend 0 >/dev/null; then
         warn "Origin certificate $CERT has expired: Cloudflare returns 526. Create a new Origin certificate."
     fi
     case "$(openssl x509 -in "$CERT" -noout -checkhost "$DOMAIN")" in
         *"does match"*) ;;
-        *) warn "Origin certificate $CERT does not cover $DOMAIN (it is for: $(openssl x509 -in "$CERT" -noout -subject -ext subjectAltName 2>/dev/null | tr '\n' ' ')). Cloudflare returns 526. Create an Origin certificate that includes $DOMAIN." ;;
+        *)
+            CERT_HOSTS="$(openssl x509 -in "$CERT" -noout -ext subjectAltName 2>/dev/null | grep -o 'DNS:[^ ,]*' | tr '\n' ' ')"
+            warn "Origin certificate $CERT does not cover $DOMAIN. Hostnames on it: ${CERT_HOSTS:-none listed}. Cloudflare returns 526 for $DOMAIN. Create an Origin certificate that includes $DOMAIN, or set DOMAIN, CERT and KEY in deploy/.env to the domain and certificate you actually serve."
+            ;;
     esac
     SERVED="$(timeout 10 openssl s_client -connect 127.0.0.1:443 -servername "$DOMAIN" </dev/null 2>/dev/null | openssl x509 -noout -fingerprint -sha256 2>/dev/null || true)"
     WANTED="$(openssl x509 -in "$CERT" -noout -fingerprint -sha256)"
     if [ "$SERVED" != "$WANTED" ]; then
         warn "Nginx does not serve $CERT for $DOMAIN (it serves: ${SERVED:-nothing}). Check ssl_certificate and server_name in /etc/nginx/sites-enabled/$APP_NAME, or re-run with FORCE_NGINX=1 to regenerate the site."
-    else
-        echo "TLS OK: Nginx serves the origin certificate for $DOMAIN"
+    fi
+    # Only claim success when every check above passed.
+    if [ "${#PENDING[@]}" -eq "$TLS_WARNINGS_BEFORE" ]; then
+        echo "TLS OK: $CERT covers $DOMAIN, is unexpired, and is the certificate Nginx serves"
     fi
 fi
 
