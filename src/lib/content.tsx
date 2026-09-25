@@ -1,11 +1,11 @@
 export function signInContent(brandName: string) {
   return {
     heading: `Sign in to ${brandName}`,
-    subheading: "with {brand_name} Appointments",
+    subheading: "with GDH Appointments",
     countryLabel: "Country",
     phonePlaceholder: "Phone number",
     cta: "Request Sign in Code",
-    disclosure: `By continuing, you'll get a one-time SMS code from {brand_name} Appointments on ${brandName}'s behalf. Message and data rates may apply.`,
+    disclosure: `By continuing, you'll get a one-time SMS code from GDH Appointments on ${brandName}'s behalf. Message and data rates may apply.`,
   };
 }
 

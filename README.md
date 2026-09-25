@@ -1,6 +1,6 @@
-# {brand_name} Appointments — sign-in reference
+# GDH Appointments — sign-in reference
 
-A white-label, phone-OTP sign-in flow: "Sign in to **{brand}** with {brand_name} Appointments." Each client business (tenant) gets its own name, accent color, and allowed countries; identity and delivery stay centralized.
+A white-label, phone-OTP sign-in flow: "Sign in to **{brand}** with GDH Appointments." Each client business (tenant) gets its own name, accent color, and allowed countries; identity and delivery stay centralized.
 
 Design doc: tenancy model, flow, data model, API surface, and security limits are written up separately (see the published artifact link shared alongside this repo).
 

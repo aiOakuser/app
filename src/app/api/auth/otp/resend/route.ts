@@ -25,7 +25,7 @@ export async function POST(request: Request) {
   await sendOtpSms(
     existing.phoneE164,
     result.code,
-    tenant?.displayName ?? "{brand_name} Appointments",
+    tenant?.displayName ?? "GDH Appointments",
   );
 
   return NextResponse.json({
