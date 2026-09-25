@@ -41,7 +41,7 @@ export default async function WelcomePage({
           You&rsquo;re signed in to {tenant.displayName}
         </h1>
         <p className="mb-8 text-[14.5px] text-neutral-500">
-          Session verified for {session.phoneMasked} via {brand_name}{" "}
+          Session verified for {session.phoneMasked} via GDH{" "}
           Appointments.
         </p>
         <form action={signOut}>

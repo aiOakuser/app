@@ -1,6 +1,6 @@
 import { SignJWT, jwtVerify } from "jose";
 
-export const SESSION_COOKIE = "{brand_name}_session";
+export const SESSION_COOKIE = "gdh_session";
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7; // 7 days — a production build would
 // split this into a short-lived access token plus a rotating refresh token.
 

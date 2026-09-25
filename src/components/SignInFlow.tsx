@@ -383,7 +383,7 @@ export function SignInFlow({
               Complete your profile
             </h1>
             <p className="mb-5 text-center text-[13.5px] text-neutral-500 sm:mb-6 sm:text-[20px]">
-              Looks like you&rsquo;ve booked with {brand_name} Appointments
+              Looks like you&rsquo;ve booked with GDH Appointments
               before. Please complete your profile to view your account with{" "}
               {tenant.displayName}.
             </p>

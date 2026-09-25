@@ -22,7 +22,7 @@ export async function sendOtpSms(
 
   if (!client || !fromNumber) {
     console.log(
-      `[sms] to=${phoneE164} from="${brandName} via {brand_name} Appointments" body="${body}"`,
+      `[sms] to=${phoneE164} from="${brandName} via GDH Appointments" body="${body}"`,
     );
     return;
   }
